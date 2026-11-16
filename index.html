@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Helena Moraes · Psicóloga</title>
+  <meta name="description" content="Psicoterapia para adultos, presencial e online. Agende sua consulta direto pelo site.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gloock&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+  <header class="topo">
+    <div class="wrap topo__in">
+      <a href="#inicio" class="marca">
+        <span class="marca__nome">Helena Moraes</span>
+        <span class="marca__crp">Psicóloga · CRP 00/00000</span>
+      </a>
+      <button class="menu-btn" aria-expanded="false" aria-controls="nav" aria-label="Abrir menu">
+        <span></span><span></span>
+      </button>
+      <nav id="nav" class="nav">
+        <a href="#sobre">Sobre</a>
+        <a href="#atendimentos">Atendimentos</a>
+        <a href="#como-funciona">Como funciona</a>
+        <a href="#duvidas">Dúvidas</a>
+        <span id="conta-nav" class="conta-nav"><a href="entrar.html">Entrar</a></span>
+        <a href="#agendar" class="btn btn--ocre btn--sm">Agendar consulta</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="inicio">
+
+    <!-- HERO: a própria agenda é a tese da página -->
+    <section class="hero">
+      <div class="wrap hero__grid">
+        <div class="hero__texto">
+          <p class="sobretitulo">Psicoterapia para adultos · presencial e online</p>
+          <h1>Um horário <em>só seu</em>, toda semana.</h1>
+          <p class="hero__lead">
+            Um espaço de escuta sem pressa para falar de ansiedade, luto, relações e
+            das mudanças que a vida traz. Escolha o melhor horário e agende em poucos minutos.
+          </p>
+          <div class="hero__acoes">
+            <a href="#agendar" class="btn btn--ocre">Agendar consulta</a>
+            <a href="#sobre" class="btn btn--linha">Conhecer a Helena</a>
+          </div>
+        </div>
+
+        <aside class="proximos" aria-labelledby="proximos-titulo">
+          <div class="proximos__foto">
+            <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=900&q=75"
+                 alt="Poltrona amarela em uma sala clara e silenciosa" loading="eager">
+          </div>
+          <div class="proximos__cartao">
+            <h2 id="proximos-titulo">Próximos horários livres</h2>
+            <ul class="proximos__lista" id="proximos-lista">
+              <li class="proximos__vazio">Carregando horários…</li>
+            </ul>
+            <a href="#agendar" class="proximos__mais">Ver agenda completa →</a>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- SOBRE -->
+    <section id="sobre" class="secao">
+      <div class="wrap sobre">
+        <figure class="sobre__foto">
+          <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&q=75"
+               alt="Retrato da psicóloga Helena Moraes" loading="lazy">
+        </figure>
+        <div class="sobre__texto">
+          <p class="sobretitulo">Sobre</p>
+          <h2>Olá, eu sou a Helena.</h2>
+          <p>
+            Sou psicóloga clínica há mais de 10 anos, com formação em Terapia
+            Cognitivo-Comportamental e especialização em ansiedade e luto. Atendo adultos
+            que querem entender melhor o que sentem e encontrar novas formas de lidar
+            com o dia a dia.
+          </p>
+          <p>
+            Acredito numa terapia feita de conversa honesta, objetivos claros e respeito
+            ao seu ritmo. Você não precisa chegar com tudo resolvido na cabeça — a
+            primeira sessão serve justamente para isso.
+          </p>
+          <dl class="fatos">
+            <div><dt>Formação</dt><dd>Psicologia — Universidade Federal</dd></div>
+            <div><dt>Abordagem</dt><dd>Terapia Cognitivo-Comportamental</dd></div>
+            <div><dt>Registro</dt><dd>CRP 00/00000</dd></div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <!-- ATENDIMENTOS -->
+    <section id="atendimentos" class="secao secao--tinta">
+      <div class="wrap">
+        <p class="sobretitulo">Atendimentos</p>
+        <h2>Como posso te ajudar</h2>
+        <div class="cards">
+          <article class="card">
+            <h3>Psicoterapia individual</h3>
+            <p>Sessões semanais de 50 minutos para adultos, no consultório.</p>
+            <p class="card__preco">R$ 200 <span>por sessão</span></p>
+          </article>
+          <article class="card">
+            <h3>Atendimento online</h3>
+            <p>A mesma escuta, por videochamada, de onde você estiver. O link chega por e-mail.</p>
+            <p class="card__preco">R$ 180 <span>por sessão</span></p>
+          </article>
+          <article class="card">
+            <h3>Orientação a pais</h3>
+            <p>Encontros pontuais para pensar juntos sobre os desafios da criação dos filhos.</p>
+            <p class="card__preco">R$ 220 <span>por sessão</span></p>
+          </article>
+        </div>
+        <ul class="temas" aria-label="Temas atendidos">
+          <li>Ansiedade</li><li>Depressão</li><li>Luto</li><li>Autoestima</li>
+          <li>Relacionamentos</li><li>Estresse no trabalho</li><li>Transições de vida</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- COMO FUNCIONA (é uma sequência real) -->
+    <section id="como-funciona" class="secao">
+      <div class="wrap">
+        <p class="sobretitulo">Como funciona</p>
+        <h2>Do agendamento à primeira sessão</h2>
+        <ol class="passos">
+          <li><h3>Escolha o horário</h3><p>Veja os horários livres e reserve o que encaixa na sua rotina.</p></li>
+          <li><h3>Receba a confirmação</h3><p>Entro em contato pelo WhatsApp ou e-mail para confirmar.</p></li>
+          <li><h3>Primeira conversa</h3><p>Conhecemos sua história e combinamos juntos os próximos passos.</p></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- AGENDAMENTO -->
+    <section id="agendar" class="secao secao--nevoa">
+      <div class="wrap">
+        <p class="sobretitulo">Agendamento</p>
+        <h2>Agende sua consulta</h2>
+
+        <div class="agenda" id="agenda">
+          <!-- Etapa 1: modalidade + data + horário -->
+          <div class="agenda__etapa" data-etapa="1">
+            <fieldset class="modalidade">
+              <legend>Modalidade</legend>
+              <label class="pilula"><input type="radio" name="modalidade" value="Presencial" checked><span>Presencial</span></label>
+              <label class="pilula"><input type="radio" name="modalidade" value="Online"><span>Online</span></label>
+            </fieldset>
+
+            <div class="agenda__grid">
+              <div class="calendario" aria-label="Escolha uma data">
+                <div class="calendario__topo">
+                  <button type="button" class="cal-nav" id="mes-ant" aria-label="Mês anterior">‹</button>
+                  <strong id="mes-titulo"></strong>
+                  <button type="button" class="cal-nav" id="mes-prox" aria-label="Próximo mês">›</button>
+                </div>
+                <div class="calendario__semana" aria-hidden="true">
+                  <span>D</span><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span>
+                </div>
+                <div class="calendario__dias" id="cal-dias" role="grid"></div>
+              </div>
+
+              <div class="horarios">
+                <h3 id="horarios-titulo">Escolha uma data</h3>
+                <div class="horarios__lista" id="horarios-lista">
+                  <p class="vazio">Os dias com horário livre aparecem destacados no calendário.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="agenda__rodape">
+              <p id="resumo-sel" class="resumo">Nenhum horário escolhido.</p>
+              <button type="button" class="btn btn--ocre" id="ir-dados" disabled>Continuar</button>
+            </div>
+          </div>
+
+          <!-- Etapa 2: dados -->
+          <form class="agenda__etapa" data-etapa="2" id="form-dados" hidden novalidate>
+            <p class="resumo resumo--destaque" id="resumo-dados"></p>
+            <p class="agendando-como" id="agendando-como"></p>
+            <div class="campos">
+              <label>É sua primeira consulta comigo?
+                <select name="primeira">
+                  <option>Sim</option>
+                  <option>Não</option>
+                </select>
+              </label>
+              <label class="campos__largo">Quer contar algo antes da sessão? <small>(opcional)</small>
+                <textarea name="obs" rows="3" maxlength="500"></textarea>
+              </label>
+            </div>
+            <p class="erro" id="erro-dados" role="alert" hidden></p>
+            <div class="agenda__rodape">
+              <button type="button" class="btn btn--linha" id="voltar">Voltar</button>
+              <button type="submit" class="btn btn--ocre">Confirmar agendamento</button>
+            </div>
+          </form>
+
+          <!-- Etapa 3: confirmação -->
+          <div class="agenda__etapa confirmado" data-etapa="3" hidden>
+            <h3>Consulta agendada</h3>
+            <p id="confirmado-texto"></p>
+            <p>Vou entrar em contato para confirmar. Se preferir, me avise agora pelo WhatsApp.</p>
+            <div class="agenda__rodape">
+              <a class="btn btn--ocre" id="link-whats" target="_blank" rel="noopener">Avisar pelo WhatsApp</a>
+              <a class="btn btn--linha" href="minha-conta.html">Ver minhas consultas</a>
+              <button type="button" class="btn btn--linha" id="novo">Agendar outro horário</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DÚVIDAS -->
+    <section id="duvidas" class="secao secao--nevoa">
+      <div class="wrap duvidas">
+        <div>
+          <p class="sobretitulo">Dúvidas</p>
+          <h2>Perguntas frequentes</h2>
+        </div>
+        <div class="faq">
+          <details>
+            <summary>Atende por convênio?</summary>
+            <p>O atendimento é particular. Emito recibo para você pedir reembolso ao seu plano de saúde.</p>
+          </details>
+          <details>
+            <summary>Quanto tempo dura cada sessão?</summary>
+            <p>Cada sessão dura 50 minutos, normalmente uma vez por semana.</p>
+          </details>
+          <details>
+            <summary>Como funciona o atendimento online?</summary>
+            <p>Por videochamada, em plataforma segura. Você recebe o link por e-mail antes do horário. Basta um lugar reservado e boa conexão.</p>
+          </details>
+          <details>
+            <summary>Posso remarcar uma sessão?</summary>
+            <p>Pode, com pelo menos 24 horas de antecedência. Entre na sua conta, cancele em “Minhas consultas” e escolha um novo horário.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">
+    <div class="wrap rodape__grid">
+      <div>
+        <strong class="marca__nome">Helena Moraes</strong>
+        <p>Psicóloga · CRP 00/00000</p>
+      </div>
+      <div>
+        <p>Rua Exemplo, 123 — sala 45<br>Centro · Sua Cidade</p>
+      </div>
+      <div>
+        <p><a href="mailto:contato@exemplo.com.br">contato@exemplo.com.br</a><br>(00) 00000-0000</p>
+      </div>
+    </div>
+    <p class="wrap rodape__aviso">
+      Este site não atende emergências. Em sofrimento intenso, ligue para o CVV no
+      <strong>188</strong> (24 horas, gratuito) ou procure o pronto-atendimento mais próximo.
+    </p>
+  </footer>
+
+  <script src="assets/db.js"></script>
+  <script src="assets/comum.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
