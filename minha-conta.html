@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Minhas consultas · Helena Moraes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gloock&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="pagina-interna">
+
+  <header class="topo">
+    <div class="wrap topo__in">
+      <a href="index.html" class="marca">
+        <span class="marca__nome">Helena Moraes</span>
+        <span class="marca__crp">Psicóloga · CRP 00/00000</span>
+      </a>
+      <nav class="nav nav--fixa">
+        <span id="conta-nav" class="conta-nav"></span>
+        <a href="index.html#agendar" class="btn btn--ocre btn--sm">Agendar consulta</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap area">
+    <p class="sobretitulo">Minha conta</p>
+    <h1 id="saudacao">Minhas consultas</h1>
+    <p class="area__dados" id="meus-dados"></p>
+
+    <h2 class="area__sub">Próximas</h2>
+    <ul class="lista-consultas" id="proximas" aria-live="polite"></ul>
+
+    <h2 class="area__sub">Histórico</h2>
+    <ul class="lista-consultas" id="historico"></ul>
+  </main>
+
+  <script src="assets/db.js"></script>
+  <script src="assets/comum.js"></script>
+  <script src="assets/minha-conta.js"></script>
+</body>
+</html>

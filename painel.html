@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Painel · Helena Moraes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gloock&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="pagina-interna">
+
+  <header class="topo">
+    <div class="wrap topo__in">
+      <a href="index.html" class="marca">
+        <span class="marca__nome">Helena Moraes</span>
+        <span class="marca__crp">Painel da psicóloga</span>
+      </a>
+      <nav class="nav nav--fixa">
+        <a href="index.html">Ver site</a>
+        <span id="conta-nav" class="conta-nav"></span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap area">
+    <div class="painel-topo">
+      <div>
+        <p class="sobretitulo">Painel</p>
+        <h1>Sua agenda</h1>
+      </div>
+      <button type="button" class="btn btn--ocre" id="btn-nova">Nova consulta</button>
+    </div>
+
+    <div class="secoes" role="tablist" aria-label="Seções do painel">
+      <button role="tab" data-secao="consultas" aria-selected="true">Consultas</button>
+      <button role="tab" data-secao="grade" aria-selected="false">Grade de horários</button>
+      <button role="tab" data-secao="bloqueios" aria-selected="false">Bloqueios</button>
+    </div>
+
+    <p class="aviso-painel" id="aviso-painel" role="status" hidden></p>
+
+    <!-- ===== CONSULTAS ===== -->
+    <section id="sec-consultas" data-secao="consultas">
+      <dl class="resumo-painel" id="resumo-painel"></dl>
+      <div class="filtros" role="tablist" aria-label="Filtrar consultas">
+        <button role="tab" data-filtro="proximas" aria-selected="true">Próximas</button>
+        <button role="tab" data-filtro="passadas" aria-selected="false">A concluir</button>
+        <button role="tab" data-filtro="historico" aria-selected="false">Realizadas</button>
+        <button role="tab" data-filtro="canceladas" aria-selected="false">Canceladas</button>
+      </div>
+      <div id="agenda-painel" aria-live="polite"></div>
+    </section>
+
+    <!-- ===== GRADE ===== -->
+    <section id="sec-grade" data-secao="grade" hidden>
+      <p class="secao-intro">
+        Horários de início das sessões em cada dia da semana. As mudanças valem para novos
+        agendamentos — consultas já marcadas continuam como estão.
+      </p>
+
+      <div class="gerador">
+        <strong>Gerar vários horários</strong>
+        <div class="gerador__linha">
+          <label>das <input type="time" id="g-de" value="08:00"></label>
+          <label>às <input type="time" id="g-ate" value="12:00"></label>
+          <label>a cada
+            <select id="g-int">
+              <option value="30">30 min</option>
+              <option value="50">50 min</option>
+              <option value="60" selected>1 hora</option>
+              <option value="90">1h30</option>
+            </select>
+          </label>
+        </div>
+        <div class="gerador__dias" id="g-dias"></div>
+        <button type="button" class="btn btn--tinta btn--sm" id="g-add">Adicionar à grade</button>
+      </div>
+
+      <div class="grade" id="grade-dias"></div>
+
+      <div class="grade-regras">
+        <label>Antecedência mínima para o cliente agendar
+          <span><input type="number" id="cfg-antecedencia" min="0" max="168"> horas</span>
+        </label>
+        <label>Agenda aberta até
+          <span><input type="number" id="cfg-janela" min="7" max="365"> dias à frente</span>
+        </label>
+      </div>
+
+      <div class="barra-salvar">
+        <p id="grade-status">Nenhuma alteração.</p>
+        <button type="button" class="btn btn--linha btn--sm" id="grade-desfazer" disabled>Descartar alterações</button>
+        <button type="button" class="btn btn--ocre btn--sm" id="grade-salvar" disabled>Salvar grade</button>
+      </div>
+    </section>
+
+    <!-- ===== BLOQUEIOS ===== -->
+    <section id="sec-bloqueios" data-secao="bloqueios" hidden>
+      <p class="secao-intro">
+        Feche dias, períodos (férias, congressos) ou horários específicos. Clientes não conseguem
+        agendar nesses horários. Consultas já marcadas não são canceladas automaticamente.
+      </p>
+
+      <form class="bloqueio-form" id="form-bloqueio" novalidate>
+        <fieldset class="modalidade">
+          <legend>O que bloquear</legend>
+          <label class="pilula"><input type="radio" name="tipo" value="dia" checked><span>Dia inteiro</span></label>
+          <label class="pilula"><input type="radio" name="tipo" value="periodo"><span>Período</span></label>
+          <label class="pilula"><input type="radio" name="tipo" value="horario"><span>Horário específico</span></label>
+        </fieldset>
+        <div class="campos">
+          <label><span id="rot-de">Data</span>
+            <input type="date" name="de" required>
+          </label>
+          <label data-tipo="periodo" hidden>Até
+            <input type="date" name="ate">
+          </label>
+          <label data-tipo="horario" hidden>Horário
+            <input type="time" name="hora">
+          </label>
+          <label class="campos__largo">Motivo <small>(só você vê)</small>
+            <input name="motivo" maxlength="120" placeholder="Ex.: férias, congresso, consulta médica">
+          </label>
+        </div>
+        <p class="erro" role="alert" hidden></p>
+        <button type="submit" class="btn btn--tinta">Bloquear</button>
+      </form>
+
+      <h2 class="area__sub">Bloqueios ativos</h2>
+      <ul class="lista-consultas" id="lista-bloqueios"></ul>
+    </section>
+  </main>
+
+  <!-- ===== NOVA CONSULTA (em nome de um cliente) ===== -->
+  <dialog class="dialogo dialogo--largo" id="dlg-nova" aria-labelledby="dlg-nova-titulo">
+    <form id="form-nova" novalidate>
+      <h3 id="dlg-nova-titulo">Nova consulta</h3>
+
+      <fieldset class="bloco">
+        <legend>Cliente</legend>
+        <div class="abas abas--mini">
+          <button type="button" data-modo="existente" aria-selected="true">Já cadastrado</button>
+          <button type="button" data-modo="novo" aria-selected="false">Cadastrar novo</button>
+        </div>
+        <div id="cli-existente">
+          <input type="search" id="cli-busca" class="input" placeholder="Buscar por nome, e-mail ou telefone" autocomplete="off">
+          <ul class="cli-lista" id="cli-lista" role="listbox" aria-label="Clientes"></ul>
+        </div>
+        <div id="cli-novo" class="campos" hidden>
+          <label>Nome completo <input name="cNome" autocomplete="off"></label>
+          <label>WhatsApp <input name="cTelefone" type="tel" inputmode="numeric" maxlength="15" placeholder="(00) 00000-0000"></label>
+          <label class="campos__largo">E-mail <small>(opcional — permite ao cliente criar acesso ao site depois)</small>
+            <input name="cEmail" type="email" autocomplete="off">
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset class="bloco">
+        <legend>Quando</legend>
+        <div class="campos">
+          <label>Data <input type="date" name="data"></label>
+          <label>Modalidade
+            <select name="modalidade"><option>Presencial</option><option>Online</option></select>
+          </label>
+        </div>
+        <div class="horarios__lista nova-horas" id="nova-horas"></div>
+        <label class="encaixe">Ou outro horário (encaixe fora da grade)
+          <input type="time" name="horaEncaixe" class="input">
+        </label>
+      </fieldset>
+
+      <div class="campos">
+        <label>Primeira consulta?
+          <select name="primeira"><option>Sim</option><option>Não</option></select>
+        </label>
+        <label class="campos__largo">Observação <small>(opcional)</small>
+          <textarea name="obs" rows="2" maxlength="500"></textarea>
+        </label>
+      </div>
+
+      <p class="erro" role="alert" hidden></p>
+      <div class="dialogo__acoes">
+        <button type="button" class="btn btn--linha btn--sm" id="nova-fechar">Fechar</button>
+        <button type="submit" class="btn btn--ocre btn--sm">Agendar consulta</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="assets/db.js"></script>
+  <script src="assets/comum.js"></script>
+  <script src="assets/painel-config.js"></script>
+  <script src="assets/painel.js"></script>
+</body>
+</html>

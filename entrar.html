@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Entrar · Helena Moraes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gloock&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="pagina-interna">
+
+  <header class="topo">
+    <div class="wrap topo__in">
+      <a href="index.html" class="marca">
+        <span class="marca__nome">Helena Moraes</span>
+        <span class="marca__crp">Psicóloga · CRP 00/00000</span>
+      </a>
+      <a href="index.html" class="voltar-site">← Voltar ao site</a>
+    </div>
+  </header>
+
+  <main class="wrap auth">
+    <div class="auth__lado">
+      <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=700&q=70" alt="" aria-hidden="true">
+    </div>
+
+    <div class="auth__caixa">
+      <div class="abas" role="tablist">
+        <button role="tab" id="aba-entrar" aria-selected="true" aria-controls="form-entrar">Entrar</button>
+        <button role="tab" id="aba-cadastro" aria-selected="false" aria-controls="form-cadastro">Criar conta</button>
+      </div>
+
+      <p class="auth__contexto" id="auth-contexto" hidden>Entre ou crie sua conta para concluir o agendamento. O horário que você escolheu fica guardado.</p>
+
+      <!-- ENTRAR -->
+      <form id="form-entrar" class="campos campos--uma" novalidate>
+        <h1>Entre na sua conta</h1>
+        <label>E-mail
+          <input name="email" type="email" autocomplete="email" required>
+        </label>
+        <label>Senha
+          <input name="senha" type="password" autocomplete="current-password" required>
+        </label>
+        <p class="erro" role="alert" hidden></p>
+        <button class="btn btn--ocre" type="submit">Entrar</button>
+        <p class="auth__dica" id="dica-prototipo" hidden>
+          Modo protótipo — a psicóloga entra com <strong>psicologa@exemplo.com</strong> e senha <strong>troque123</strong>.
+        </p>
+      </form>
+
+      <!-- CRIAR CONTA -->
+      <form id="form-cadastro" class="campos campos--uma" novalidate hidden>
+        <h1>Crie sua conta</h1>
+        <label>Nome completo
+          <input name="nome" autocomplete="name" required>
+        </label>
+        <label>E-mail
+          <input name="email" type="email" autocomplete="email" required>
+        </label>
+        <label>WhatsApp
+          <input name="telefone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="(00) 00000-0000" maxlength="15" required>
+        </label>
+        <label>Senha <small>(mínimo 6 caracteres)</small>
+          <input name="senha" type="password" autocomplete="new-password" minlength="6" required>
+        </label>
+        <label>Confirme a senha
+          <input name="senha2" type="password" autocomplete="new-password" required>
+        </label>
+        <label class="aceite">
+          <input type="checkbox" name="aceite" required>
+          Concordo que meus dados sejam usados apenas para os agendamentos, conforme a LGPD.
+        </label>
+        <p class="erro" role="alert" hidden></p>
+        <button class="btn btn--ocre" type="submit">Criar conta</button>
+      </form>
+    </div>
+  </main>
+
+  <script src="assets/db.js"></script>
+  <script src="assets/comum.js"></script>
+  <script src="assets/entrar.js"></script>
+</body>
+</html>
