@@ -49,6 +49,7 @@ const HttpApi = (() => {
         return r.usuario;
       },
       async sair() { localStorage.removeItem(TOKEN); },
+      trocarSenha: (atual, nova) => req('POST', '/auth/senha', { atual, nova }),
       async atual() {
         if (!localStorage.getItem(TOKEN)) return null;
         try { return await req('GET', '/auth/me'); } catch { localStorage.removeItem(TOKEN); return null; }
@@ -74,6 +75,8 @@ const HttpApi = (() => {
     clientes: {
       listar: (busca = '') => req('GET', `/clientes?busca=${encodeURIComponent(busca)}`),
       criar: (dados) => req('POST', '/clientes', dados),
+      atualizar: (id, dados) => req('PUT', `/clientes/${id}`, dados),
+      excluir: (id) => req('DELETE', `/clientes/${id}`),
     },
   };
 })();
@@ -125,7 +128,24 @@ const LocalApi = (() => {
 
   const publico = (u) => u && {
     id: u.id, nome: u.nome, email: u.email, telefone: u.telefone, perfil: u.perfil, temAcesso: !!u.senhaHash,
+    criadoEm: u.criadoEm, excluido: !!u.excluidoEm, senhaProvisoria: !!u.senhaProvisoria,
   };
+  const ativo = (u) => u && !u.excluidoEm;
+  const RE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+  // valida e normaliza os dados de um cliente (usado ao criar e ao editar)
+  function dadosCliente({ nome, email, telefone, senha }) {
+    nome = (nome || '').trim();
+    email = (email || '').trim().toLowerCase();
+    telefone = (telefone || '').trim();
+    senha = senha || '';
+    if (!nome) throw new ErroApi('Informe o nome do cliente.', 400);
+    if (telefone.replace(/\D/g, '').length !== 11) throw new ErroApi('Informe o WhatsApp com DDD (11 números).', 400);
+    if (email && !RE_EMAIL.test(email)) throw new ErroApi('O e-mail não parece válido.', 400);
+    if (senha && !email) throw new ErroApi('Para criar a senha de acesso, informe o e-mail do cliente.', 400);
+    if (senha && senha.length < 6) throw new ErroApi('A senha precisa ter 6 caracteres ou mais.', 400);
+    return { nome, email, telefone, senha };
+  }
 
   // dados iniciais na primeira execução
   const pronto = (async () => {
@@ -153,7 +173,8 @@ const LocalApi = (() => {
 
   function usuarioSessao() {
     const id = ler(K.sessao, null);
-    return ler(K.usuarios, []).find((u) => u.id === id) || null;
+    const u = ler(K.usuarios, []).find((x) => x.id === id);
+    return ativo(u) ? u : null;
   }
   async function exigir(perfil) {
     await pronto;
@@ -174,11 +195,12 @@ const LocalApi = (() => {
         email = email.trim().toLowerCase();
         const us = ler(K.usuarios, []);
         const existente = us.find((u) => u.email === email);
+        if (existente && existente.excluidoEm) throw new ErroApi('Este cadastro foi encerrado. Fale com a psicóloga para reativar.', 409);
         if (existente && existente.senhaHash) throw new ErroApi('Já existe uma conta com este e-mail. Use "Entrar".', 409);
         // conta criada pela psicóloga sem senha: o cliente ativa o acesso definindo a senha
         // (no backend real, confirmar o e-mail antes de liberar)
         const u = existente || { id: novoId(), perfil: 'cliente', criadoEm: agora() };
-        Object.assign(u, { nome: nome.trim(), email, telefone, senhaHash: await hash(senha) });
+        Object.assign(u, { nome: nome.trim(), email, telefone, senhaHash: await hash(senha), senhaProvisoria: false });
         if (!existente) us.push(u);
         gravar(K.usuarios, us);
         gravar(K.sessao, u.id);
@@ -187,6 +209,7 @@ const LocalApi = (() => {
       async entrar(email, senha) {
         await pronto;
         const u = ler(K.usuarios, []).find((x) => x.email === email.trim().toLowerCase());
+        if (u && u.excluidoEm) throw new ErroApi('Este cadastro foi encerrado. Fale com a psicóloga.', 401);
         if (u && !u.senhaHash) {
           throw new ErroApi('Seu cadastro foi feito pela psicóloga. Use "Criar conta" com este e-mail para definir sua senha.', 401);
         }
@@ -196,6 +219,17 @@ const LocalApi = (() => {
       },
       async sair() { localStorage.removeItem(K.sessao); },
       async atual() { await pronto; return publico(usuarioSessao()); },
+      async trocarSenha(atual, nova) {
+        const eu = await exigir();
+        if ((nova || '').length < 6) throw new ErroApi('A nova senha precisa ter 6 caracteres ou mais.', 400);
+        const us = ler(K.usuarios, []);
+        const u = us.find((x) => x.id === eu.id);
+        if (u.senhaHash !== (await hash(atual || ''))) throw new ErroApi('A senha atual está incorreta.', 401);
+        if (atual === nova) throw new ErroApi('A nova senha precisa ser diferente da atual.', 400);
+        Object.assign(u, { senhaHash: await hash(nova), senhaProvisoria: false, atualizadoEm: agora() });
+        gravar(K.usuarios, us);
+        return { ok: true };
+      },
     },
 
     config: {
@@ -234,19 +268,25 @@ const LocalApi = (() => {
         const u = await exigir();
         let dono = u;
         if (u.perfil === 'psicologa') {
-          dono = ler(K.usuarios, []).find((x) => x.id === d.usuarioId && x.perfil === 'cliente');
+          dono = ler(K.usuarios, []).find((x) => x.id === d.usuarioId && x.perfil === 'cliente' && ativo(x));
           if (!dono) throw new ErroApi('Escolha o cliente da consulta.', 400);
         }
         if (!RE_DATA.test(d.data || '') || !RE_HORA.test(d.hora || '')) throw new ErroApi('Data ou horário inválido.', 400);
         const quando = momento(d.data, d.hora).getTime();
         if (quando < Date.now()) throw new ErroApi('Escolha uma data e horário no futuro.', 400);
         if (slotOcupado(d.data, d.hora)) throw new ErroApi('Este horário acabou de ser ocupado. Escolha outro.', 409);
+        // bloqueio vale para todos, inclusive para a psicóloga
+        if (slotBloqueado(d.data, d.hora)) {
+          throw new ErroApi(u.perfil === 'psicologa'
+            ? 'Este dia/horário está bloqueado. Remova o bloqueio na aba Bloqueios para agendar.'
+            : 'Este horário não está disponível. Escolha outro.', 409);
+        }
 
-        // cliente só agenda dentro das regras; a psicóloga pode encaixar fora da grade e em bloqueios
+        // cliente só agenda dentro das regras; a psicóloga pode encaixar fora da grade
         if (u.perfil === 'cliente') {
           const c = cfg();
           const naGrade = (c.grade[momento(d.data).getDay()] || []).includes(d.hora);
-          if (!naGrade || slotBloqueado(d.data, d.hora)) throw new ErroApi('Este horário não está disponível. Escolha outro.', 409);
+          if (!naGrade) throw new ErroApi('Este horário não está disponível. Escolha outro.', 409);
           if (quando < Date.now() + c.antecedenciaHoras * 3600000) {
             throw new ErroApi(`Agende com pelo menos ${c.antecedenciaHoras} horas de antecedência.`, 409);
           }
@@ -256,7 +296,7 @@ const LocalApi = (() => {
         const lista = ler(K.agend, []);
         const a = {
           id: novoId(), usuarioId: dono.id, data: d.data, hora: d.hora,
-          modalidade: d.modalidade === 'Online' ? 'Online' : 'Presencial',
+          modalidade: 'Online',                       // a profissional só atende online
           primeira: d.primeira === 'Não' ? 'Não' : 'Sim', obs: (d.obs || '').slice(0, 500),
           status: 'agendada', criadoPor: u.perfil, criadoEm: agora(),
           canceladoPor: null, motivoCancelamento: '', canceladoEm: null,
@@ -280,7 +320,9 @@ const LocalApi = (() => {
         if (!a) throw new ErroApi('Consulta não encontrada.', 404);
         if (u.perfil !== 'psicologa' && a.usuarioId !== u.id) throw new ErroApi('Você não pode cancelar esta consulta.', 403);
         if (a.status !== 'agendada') throw new ErroApi('Esta consulta não está mais ativa.', 409);
-        Object.assign(a, { status: 'cancelada', canceladoPor: u.perfil, motivoCancelamento: motivo.trim(), canceladoEm: agora() });
+        motivo = (motivo || '').trim().slice(0, 300);
+        if (u.perfil === 'cliente' && !motivo) throw new ErroApi('Escreva o motivo do cancelamento.', 400);
+        Object.assign(a, { status: 'cancelada', canceladoPor: u.perfil, motivoCancelamento: motivo, canceladoEm: agora() });
         gravar(K.agend, lista);
         return comCliente(a);
       },
@@ -329,24 +371,63 @@ const LocalApi = (() => {
         const t = busca.trim().toLowerCase();
         const dig = t.replace(/\D/g, '');
         return ler(K.usuarios, [])
-          .filter((u) => u.perfil === 'cliente')
+          .filter((u) => u.perfil === 'cliente' && ativo(u))
           .filter((u) => !t || u.nome.toLowerCase().includes(t) || (u.email || '').includes(t)
             || (dig.length >= 3 && (u.telefone || '').replace(/\D/g, '').includes(dig)))
           .sort((a, b) => a.nome.localeCompare(b.nome))
           .map(publico);
       },
       // cliente cadastrado pela psicóloga: sem senha até ele mesmo criar a conta
-      async criar({ nome, email, telefone }) {
+      // se o e-mail é de um cliente excluído, reativa o cadastro (com o histórico)
+      async criar(dados) {
         await exigir('psicologa');
-        email = (email || '').trim().toLowerCase();
-        if (!nome?.trim()) throw new ErroApi('Informe o nome do cliente.', 400);
-        if ((telefone || '').replace(/\D/g, '').length !== 11) throw new ErroApi('Informe o WhatsApp com DDD (11 números).', 400);
+        const { nome, email, telefone, senha } = dadosCliente(dados);
         const us = ler(K.usuarios, []);
-        if (email && us.some((u) => u.email === email)) throw new ErroApi('Já existe um cliente com este e-mail. Busque por ele na lista.', 409);
-        const u = { id: novoId(), nome: nome.trim(), email, telefone, perfil: 'cliente', senhaHash: null, criadoPor: 'psicologa', criadoEm: agora() };
-        us.push(u);
+        const mesmo = email && us.find((u) => u.email === email);
+        if (mesmo && !(mesmo.perfil === 'cliente' && mesmo.excluidoEm)) {
+          throw new ErroApi('Já existe um cliente com este e-mail. Busque por ele na lista.', 409);
+        }
+        const u = mesmo || { id: novoId(), perfil: 'cliente', senhaHash: null, criadoPor: 'psicologa', criadoEm: agora() };
+        Object.assign(u, { nome, email, telefone, excluidoEm: null });
+        // senha inicial definida pela psicóloga: o cliente já pode entrar, e o site pede para ele trocar
+        if (senha) Object.assign(u, { senhaHash: await hash(senha), senhaProvisoria: true });
+        if (!mesmo) us.push(u);
         gravar(K.usuarios, us);
         return publico(u);
+      },
+      async atualizar(id, dados) {
+        await exigir('psicologa');
+        const us = ler(K.usuarios, []);
+        const u = us.find((x) => x.id === id && x.perfil === 'cliente' && ativo(x));
+        if (!u) throw new ErroApi('Cliente não encontrado.', 404);
+        const { nome, email, telefone, senha } = dadosCliente(dados);
+        if (!email && u.senhaHash) throw new ErroApi('Este cliente entra no site com o e-mail, então ele não pode ficar em branco.', 400);
+        if (email && us.some((x) => x.id !== id && x.email === email)) throw new ErroApi('Já existe outro cadastro com este e-mail.', 409);
+        Object.assign(u, { nome, email, telefone, atualizadoEm: agora() });
+        // senha preenchida = redefinir (ex.: cliente esqueceu); em branco = manter
+        if (senha) Object.assign(u, { senhaHash: await hash(senha), senhaProvisoria: true });
+        gravar(K.usuarios, us);
+        return publico(u);
+      },
+      // exclusão lógica: o histórico de consultas fica guardado (registro obrigatório)
+      // e as consultas futuras são canceladas. O cliente perde o acesso ao site.
+      async excluir(id) {
+        await exigir('psicologa');
+        const us = ler(K.usuarios, []);
+        const u = us.find((x) => x.id === id && x.perfil === 'cliente' && ativo(x));
+        if (!u) throw new ErroApi('Cliente não encontrado.', 404);
+        u.excluidoEm = agora();
+        gravar(K.usuarios, us);
+        const lista = ler(K.agend, []);
+        let canceladas = 0;
+        lista.forEach((a) => {
+          if (a.usuarioId === id && a.status === 'agendada' && momento(a.data, a.hora).getTime() > Date.now()) {
+            Object.assign(a, { status: 'cancelada', canceladoPor: 'psicologa', motivoCancelamento: 'Cadastro do cliente encerrado.', canceladoEm: agora() });
+            canceladas++;
+          }
+        });
+        gravar(K.agend, lista);
+        return { ok: true, canceladas };
       },
     },
   };

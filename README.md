@@ -5,15 +5,18 @@ Site estático (HTML + CSS + JS puro, sem build). Abra o `index.html` no navegad
 ## Páginas
 | Arquivo | Para quem | O que faz |
 |---|---|---|
-| `index.html` | todos | Site + agenda. Escolher horário é livre; para confirmar, precisa estar logado. |
-| `entrar.html` | todos | Entrar / criar conta. Guarda o horário escolhido e volta para concluir. |
-| `minha-conta.html` | cliente | Próximas consultas (pode cancelar) e histórico, com o motivo quando a psicóloga cancela. |
-| `painel.html` | psicóloga | **Consultas**: todas por dia, cancelar com motivo, marcar como realizada, **Nova consulta** em nome de um cliente (cadastrado ou novo, com encaixe fora da grade). **Grade de horários**: editar horários por dia da semana, antecedência mínima e até quando a agenda abre. **Bloqueios**: dia inteiro, período ou horário específico. |
+| `index.html` | todos | Site + agenda. Os 3 próximos horários livres aparecem para todos; a grade completa só aparece depois de entrar. |
+| `entrar.html` | todos | Entrar / criar conta (`?aba=cadastro` abre direto em "Criar conta"). Guarda o horário escolhido e volta para concluir. |
+| `minha-conta.html` | cliente | Próximas consultas (pode cancelar, com motivo obrigatório), histórico com o motivo quando a psicóloga cancela, e **Alterar senha**. |
+| `painel.html` | psicóloga | **Consultas**: todas por dia, cancelar com motivo, marcar como realizada, **Nova consulta** em nome de um cliente (cadastrado ou novo, com encaixe fora da grade). **Grade de horários**: editar horários por dia da semana, antecedência mínima e até quando a agenda abre. **Bloqueios**: dia inteiro, período ou horário específico. **Clientes**: lista com busca, incluir, editar, excluir e agendar direto pelo cliente. |
 
 ## Níveis de acesso
 - **cliente**: cria conta pelo site, agenda e cancela as próprias consultas.
 - **psicologa**: não se cadastra pelo site (é criada no banco). Vê e cancela qualquer consulta, edita a grade e os bloqueios, agenda em nome de clientes.
-- Cliente cadastrado pela psicóloga fica **sem senha**; para acessar o site, ele usa "Criar conta" com o mesmo e-mail.
+- Atendimento **só online**: não há escolha de modalidade; toda consulta é gravada como `Online`.
+- Bloqueios valem para todos: nem a psicóloga consegue agendar num dia/horário bloqueado.
+- Cliente cadastrado pela psicóloga: se tiver e-mail, ela já define uma senha inicial (vem preenchida com `Senha@123`, em `CONFIG.senhaPadrao`) e pode mandar o acesso pelo WhatsApp. O cliente vê um aviso para trocar a senha. Sem e-mail, fica sem acesso; para acessar depois, ele usa "Criar conta" com o mesmo e-mail.
+- Excluir cliente é uma **exclusão lógica**: ele some das listas e perde o acesso, as consultas futuras são canceladas e o histórico fica guardado. Cadastrar de novo com o mesmo e-mail reativa o cadastro.
 
 No protótipo, a conta da psicóloga já existe: **psicologa@exemplo.com / troque123**.
 
@@ -22,7 +25,7 @@ No protótipo, a conta da psicóloga já existe: **psicologa@exemplo.com / troqu
   - `modo: 'local'` → simula o banco no navegador (localStorage), com as mesmas regras de permissão.
   - `modo: 'api'` → chama o backend via HTTP. Para ligar no banco, troque o modo e ajuste `apiUrl`.
 - `assets/comum.js` — dados fixos (`CONFIG`: nome, WhatsApp) e utilidades. Grade, antecedência e bloqueios ficam no banco e são editados no painel.
-- `assets/app.js`, `entrar.js`, `minha-conta.js`, `painel.js` + `painel-config.js` — uma por página.
+- `assets/app.js`, `entrar.js`, `minha-conta.js`, `painel.js` + `painel-config.js` + `painel-clientes.js` — uma por página.
 - `banco/schema.sql` — tabelas (PostgreSQL).
 - `banco/API.md` — rotas que o backend precisa ter e as regras de segurança.
 

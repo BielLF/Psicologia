@@ -22,15 +22,16 @@ async function carregarOcupados() {
 const horariosLivres = (iso) => estado.agenda.livres(iso);
 const dentroDaJanela = (d) => estado.agenda.dentroDaJanela(d);
 
-/* ===== Próximos horários (hero) ===== */
+/* ===== Próximos horários (hero) =====
+   Os 3 primeiros horários livres a partir de agora, em ordem (podem ser no mesmo dia).
+   `livres()` já descarta horários passados e os que não respeitam a antecedência mínima. */
 function renderProximos() {
   const ul = $('#proximos-lista');
   const itens = [];
   const d = new Date(); d.setHours(0, 0, 0, 0);
   for (let i = 0; i <= estado.agenda.cfg.janelaDias && itens.length < 3; i++) {
     const iso = isoData(d);
-    const livres = horariosLivres(iso);
-    if (livres.length) itens.push({ iso, hora: livres[0] });
+    horariosLivres(iso).slice(0, 3 - itens.length).forEach((hora) => itens.push({ iso, hora }));
     d.setDate(d.getDate() + 1);
   }
   ul.innerHTML = '';
@@ -46,6 +47,7 @@ function renderProximos() {
     b.addEventListener('click', () => {
       selecionarData(iso);
       selecionarHora(hora);
+      if (!estado.usuario) { irParaDados(); return; }   // guarda o horário e vai para o login
       $('#agendar').scrollIntoView();
     });
     li.appendChild(b);
@@ -128,7 +130,7 @@ function selecionarHora(h) {
   atualizarResumo();
 }
 
-const modalidade = () => document.querySelector('input[name="modalidade"]:checked').value;
+const modalidade = () => 'Online';     // a profissional só atende online
 const textoSelecao = () => `${modalidade()} · ${fmtDiaLongo(estado.data)}, às ${estado.hora}`;
 
 function atualizarResumo() {
@@ -202,8 +204,6 @@ function retomarPendente() {
   if (!estado.usuario) return;
   try {
     const p = JSON.parse(raw);
-    const radio = document.querySelector(`input[name="modalidade"][value="${p.modalidade}"]`);
-    if (radio) radio.checked = true;
     selecionarData(p.data);
     if (horariosLivres(p.data).includes(p.hora)) {
       selecionarHora(p.hora);
@@ -220,7 +220,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   $('#mes-ant').addEventListener('click', () => { estado.mes.setMonth(estado.mes.getMonth() - 1); renderCalendario(); });
   $('#mes-prox').addEventListener('click', () => { estado.mes.setMonth(estado.mes.getMonth() + 1); renderCalendario(); });
-  document.querySelectorAll('input[name="modalidade"]').forEach((r) => r.addEventListener('change', atualizarResumo));
   $('#ir-dados').addEventListener('click', irParaDados);
   $('#voltar').addEventListener('click', () => mostrarEtapa(1));
   $('#form-dados').addEventListener('submit', confirmar);
@@ -233,6 +232,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   estado.usuario = await Api.auth.atual();
   renderContaNav(estado.usuario);
+  // sem login, a grade e os horários ficam escondidos
+  $('#agenda-login').hidden = !!estado.usuario;
+  document.querySelector('.agenda__etapa[data-etapa="1"]').hidden = !estado.usuario;
   try {
     await carregarOcupados();
   } catch (ex) {
