@@ -13,12 +13,16 @@ CREATE TABLE usuarios (
     email         VARCHAR(160) UNIQUE,               -- minúsculas; opcional só p/ cliente cadastrado pela psicóloga
     telefone      VARCHAR(20),
     senha_hash    VARCHAR(255),                      -- bcrypt/argon2; NULL = cadastrado pela psicóloga, ainda sem acesso
+    senha_provisoria BOOLEAN NOT NULL DEFAULT FALSE, -- TRUE = senha definida pela psicóloga; o site pede para trocar
     perfil        VARCHAR(20)  NOT NULL DEFAULT 'cliente'
                   CHECK (perfil IN ('cliente', 'psicologa')),
     criado_por    VARCHAR(20)  NOT NULL DEFAULT 'cliente'
                   CHECK (criado_por IN ('cliente', 'psicologa')),
     aceite_lgpd_em TIMESTAMPTZ,                      -- preenchido quando o próprio cliente cria/ativa a conta
-    criado_em     TIMESTAMPTZ  NOT NULL DEFAULT now()
+    criado_em     TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    atualizado_em TIMESTAMPTZ,
+    excluido_em   TIMESTAMPTZ                        -- exclusão lógica: some das listas e perde o acesso,
+                                                     -- mas o histórico de consultas fica guardado
 );
 -- Consultas
 CREATE TABLE agendamentos (
@@ -26,7 +30,8 @@ CREATE TABLE agendamentos (
     usuario_id           UUID NOT NULL REFERENCES usuarios(id),
     data                 DATE NOT NULL,
     hora                 TIME NOT NULL,
-    modalidade           VARCHAR(20) NOT NULL CHECK (modalidade IN ('Presencial', 'Online')),
+    modalidade           VARCHAR(20) NOT NULL DEFAULT 'Online'
+                         CHECK (modalidade IN ('Presencial', 'Online')),  -- hoje só 'Online'; 'Presencial' fica para o histórico
     primeira             BOOLEAN NOT NULL DEFAULT TRUE,
     obs                  VARCHAR(500),
     status               VARCHAR(20) NOT NULL DEFAULT 'agendada'

@@ -19,7 +19,7 @@
       </a>
       <nav class="nav nav--fixa">
         <span id="conta-nav" class="conta-nav"></span>
-        <a href="index.html#agendar" class="btn btn--ocre btn--sm">Agendar consulta</a>
+        <button type="button" class="btn btn--ocre btn--sm" data-agendar>Agendar consulta</button>
       </nav>
     </div>
   </header>
@@ -27,7 +27,15 @@
   <main class="wrap area">
     <p class="sobretitulo">Minha conta</p>
     <h1 id="saudacao">Minhas consultas</h1>
-    <p class="area__dados" id="meus-dados"></p>
+    <div class="area__conta">
+      <p class="area__dados" id="meus-dados"></p>
+      <button type="button" class="btn btn--linha btn--sm" id="btn-senha">Alterar senha</button>
+    </div>
+    <p class="aviso-painel aviso-painel--atencao" id="aviso-senha" hidden>
+      Você está usando a senha inicial que a psicóloga criou. Para sua segurança,
+      <button type="button" class="link-botao" id="link-senha">troque agora</button>.
+    </p>
+    <p class="aviso-painel aviso-painel--ok" id="aviso-conta" role="status" hidden></p>
 
     <h2 class="area__sub">Próximas</h2>
     <ul class="lista-consultas" id="proximas" aria-live="polite"></ul>
@@ -35,6 +43,57 @@
     <h2 class="area__sub">Histórico</h2>
     <ul class="lista-consultas" id="historico"></ul>
   </main>
+
+  <!-- ===== AGENDAR (versão do cliente) ===== -->
+  <dialog class="dialogo dialogo--agendar" id="dlg-agendar" aria-labelledby="dlg-agendar-titulo">
+    <form id="form-agendar" novalidate>
+      <h3 id="dlg-agendar-titulo">Agendar consulta</h3>
+      <p class="agenda__nota">Atendimento <strong>online</strong>, por videochamada. O link da sessão chega por e-mail.</p>
+
+      <fieldset class="bloco">
+        <legend>Quando</legend>
+        <div class="campos">
+          <label>Data <input type="date" name="data"></label>
+          <label>É sua primeira consulta comigo?
+            <select name="primeira"><option>Sim</option><option>Não</option></select>
+          </label>
+        </div>
+        <div class="horarios__lista nova-horas" id="ag-horas" aria-live="polite"></div>
+      </fieldset>
+
+      <div class="campos campos--uma">
+        <label>Quer contar algo antes da sessão?
+          <textarea name="obs" rows="2" maxlength="500" placeholder="Opcional"></textarea>
+        </label>
+      </div>
+
+      <p class="resumo" id="ag-resumo">Escolha a data e o horário.</p>
+      <p class="erro" role="alert" hidden></p>
+      <div class="dialogo__acoes">
+        <button type="button" class="btn btn--linha btn--sm" id="ag-fechar">Fechar</button>
+        <button type="submit" class="btn btn--ocre btn--sm">Confirmar agendamento</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- ===== ALTERAR SENHA ===== -->
+  <dialog class="dialogo dialogo--medio" id="dlg-senha" aria-labelledby="dlg-senha-titulo">
+    <form id="form-senha" novalidate>
+      <h3 id="dlg-senha-titulo">Alterar senha</h3>
+      <div class="campos campos--uma">
+        <label>Senha atual <input name="atual" type="password" autocomplete="current-password"></label>
+        <label>Nova senha <small>(6 caracteres ou mais)</small>
+          <input name="nova" type="password" autocomplete="new-password" minlength="6">
+        </label>
+        <label>Repita a nova senha <input name="nova2" type="password" autocomplete="new-password"></label>
+      </div>
+      <p class="erro" role="alert" hidden></p>
+      <div class="dialogo__acoes">
+        <button type="button" class="btn btn--linha btn--sm" id="senha-fechar">Fechar</button>
+        <button type="submit" class="btn btn--ocre btn--sm">Salvar nova senha</button>
+      </div>
+    </form>
+  </dialog>
 
   <script src="assets/db.js"></script>
   <script src="assets/comum.js"></script>

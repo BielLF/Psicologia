@@ -41,11 +41,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   const atual = await Api.auth.atual();
   if (atual) { location.href = destinoApos(atual); return; }
 
-  if (new URLSearchParams(location.search).get('volta')) $('#auth-contexto').hidden = false;
+  if (new URLSearchParams(location.search).get('volta')) {
+    // sem horário guardado (veio do botão "Entrar para ver os horários"), o texto muda
+    if (!sessionStorage.getItem('psi_agendamento_pendente')) {
+      $('#auth-contexto').textContent = 'Entre ou crie sua conta para ver os horários livres e agendar sua consulta.';
+    }
+    $('#auth-contexto').hidden = false;
+  }
   if (DB_CONFIG.modo === 'local') $('#dica-prototipo').hidden = false;
 
   $('#aba-entrar').addEventListener('click', () => trocarAba('entrar'));
   $('#aba-cadastro').addEventListener('click', () => trocarAba('cadastro'));
+  if (new URLSearchParams(location.search).get('aba') === 'cadastro') trocarAba('cadastro');
 
   const tel = $('#form-cadastro [name="telefone"]');
   tel.addEventListener('input', () => { tel.value = mascaraCelular(tel.value); });

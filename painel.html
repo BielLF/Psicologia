@@ -37,6 +37,7 @@
       <button role="tab" data-secao="consultas" aria-selected="true">Consultas</button>
       <button role="tab" data-secao="grade" aria-selected="false">Grade de horários</button>
       <button role="tab" data-secao="bloqueios" aria-selected="false">Bloqueios</button>
+      <button role="tab" data-secao="clientes" aria-selected="false">Clientes</button>
     </div>
 
     <p class="aviso-painel" id="aviso-painel" role="status" hidden></p>
@@ -99,8 +100,8 @@
     <!-- ===== BLOQUEIOS ===== -->
     <section id="sec-bloqueios" data-secao="bloqueios" hidden>
       <p class="secao-intro">
-        Feche dias, períodos (férias, congressos) ou horários específicos. Clientes não conseguem
-        agendar nesses horários. Consultas já marcadas não são canceladas automaticamente.
+        Feche dias, períodos (férias, congressos) ou horários específicos. Ninguém consegue agendar
+        nesses horários — nem você pela “Nova consulta”. Consultas já marcadas não são canceladas automaticamente.
       </p>
 
       <form class="bloqueio-form" id="form-bloqueio" novalidate>
@@ -131,13 +132,50 @@
       <h2 class="area__sub">Bloqueios ativos</h2>
       <ul class="lista-consultas" id="lista-bloqueios"></ul>
     </section>
+
+    <!-- ===== CLIENTES ===== -->
+    <section id="sec-clientes" data-secao="clientes" hidden>
+      <p class="secao-intro">
+        Todos os clientes cadastrados — pelo site ou por você. Clientes cadastrados por você ficam
+        sem acesso ao site até criarem a conta com o mesmo e-mail.
+      </p>
+      <div class="clientes-barra">
+        <input type="search" id="clientes-busca" class="input" placeholder="Buscar por nome, e-mail ou telefone" autocomplete="off" aria-label="Buscar clientes">
+        <button type="button" class="btn btn--tinta btn--sm" id="cliente-novo">Novo cliente</button>
+      </div>
+      <p class="clientes-total" id="clientes-total" aria-live="polite"></p>
+      <ul class="lista-consultas" id="lista-clientes"></ul>
+    </section>
   </main>
+
+  <!-- ===== CLIENTE (incluir / editar) ===== -->
+  <dialog class="dialogo dialogo--medio" id="dlg-cliente" aria-labelledby="dlg-cliente-titulo">
+    <form id="form-cliente" novalidate>
+      <h3 id="dlg-cliente-titulo">Novo cliente</h3>
+      <div class="campos campos--uma">
+        <label>Nome completo <input name="nome" autocomplete="off" maxlength="120"></label>
+        <label>WhatsApp <input name="telefone" type="tel" inputmode="numeric" maxlength="15" placeholder="(00) 00000-0000"></label>
+        <label>E-mail <small id="cliente-email-dica">(opcional — necessário para o cliente entrar no site)</small>
+          <input name="email" type="email" autocomplete="off">
+        </label>
+        <label>Senha de acesso ao site <small id="cliente-senha-dica">(o cliente pode trocar depois em “Minhas consultas”)</small>
+          <input name="senha" type="text" autocomplete="off" spellcheck="false" maxlength="60" data-senha-padrao>
+        </label>
+      </div>
+      <p class="erro" role="alert" hidden></p>
+      <div class="dialogo__acoes">
+        <button type="button" class="btn btn--linha btn--sm" id="cliente-fechar">Fechar</button>
+        <button type="submit" class="btn btn--ocre btn--sm">Salvar</button>
+      </div>
+    </form>
+  </dialog>
 
   <!-- ===== NOVA CONSULTA (em nome de um cliente) ===== -->
   <dialog class="dialogo dialogo--largo" id="dlg-nova" aria-labelledby="dlg-nova-titulo">
     <form id="form-nova" novalidate>
       <h3 id="dlg-nova-titulo">Nova consulta</h3>
 
+      <div class="nova-grid">
       <fieldset class="bloco">
         <legend>Cliente</legend>
         <div class="abas abas--mini">
@@ -148,11 +186,14 @@
           <input type="search" id="cli-busca" class="input" placeholder="Buscar por nome, e-mail ou telefone" autocomplete="off">
           <ul class="cli-lista" id="cli-lista" role="listbox" aria-label="Clientes"></ul>
         </div>
-        <div id="cli-novo" class="campos" hidden>
-          <label>Nome completo <input name="cNome" autocomplete="off"></label>
-          <label>WhatsApp <input name="cTelefone" type="tel" inputmode="numeric" maxlength="15" placeholder="(00) 00000-0000"></label>
-          <label class="campos__largo">E-mail <small>(opcional — permite ao cliente criar acesso ao site depois)</small>
+        <div id="cli-novo" class="campos cli-novo" hidden>
+          <label class="campos__largo">Nome completo <input name="cNome" autocomplete="off"></label>
+          <label class="campos__largo">WhatsApp <input name="cTelefone" type="tel" inputmode="numeric" maxlength="15" placeholder="(00) 00000-0000"></label>
+          <label>E-mail <small>(opcional)</small>
             <input name="cEmail" type="email" autocomplete="off">
+          </label>
+          <label>Senha de acesso <small>(se tiver e-mail)</small>
+            <input name="cSenha" type="text" autocomplete="off" spellcheck="false" maxlength="60" data-senha-padrao>
           </label>
         </div>
       </fieldset>
@@ -161,22 +202,28 @@
         <legend>Quando</legend>
         <div class="campos">
           <label>Data <input type="date" name="data"></label>
-          <label>Modalidade
-            <select name="modalidade"><option>Presencial</option><option>Online</option></select>
+          <label>Primeira consulta?
+            <select name="primeira"><option>Sim</option><option>Não</option></select>
           </label>
         </div>
         <div class="horarios__lista nova-horas" id="nova-horas"></div>
-        <label class="encaixe">Ou outro horário (encaixe fora da grade)
-          <input type="time" name="horaEncaixe" class="input">
-        </label>
+        <div class="encaixe">
+          <label for="hora-encaixe">Ou outro horário (encaixe fora da grade)</label>
+          <div class="combo" id="combo-encaixe">
+            <input type="text" id="hora-encaixe" name="horaEncaixe" class="input" placeholder="00:00"
+                   inputmode="numeric" maxlength="5" autocomplete="off"
+                   role="combobox" aria-expanded="false" aria-controls="combo-lista" aria-autocomplete="list">
+            <button type="button" class="combo__seta" tabindex="-1" aria-label="Mostrar horários">▾</button>
+            <ul class="combo__lista" id="combo-lista" role="listbox" aria-label="Horários" hidden></ul>
+          </div>
+          <small>Escolha na lista ou digite qualquer horário.</small>
+        </div>
       </fieldset>
+      </div>
 
-      <div class="campos">
-        <label>Primeira consulta?
-          <select name="primeira"><option>Sim</option><option>Não</option></select>
-        </label>
-        <label class="campos__largo">Observação <small>(opcional)</small>
-          <textarea name="obs" rows="2" maxlength="500"></textarea>
+      <div class="campos campos--uma">
+        <label>Observação
+          <textarea name="obs" rows="2" maxlength="500" placeholder="Opcional"></textarea>
         </label>
       </div>
 
@@ -191,6 +238,7 @@
   <script src="assets/db.js"></script>
   <script src="assets/comum.js"></script>
   <script src="assets/painel-config.js"></script>
+  <script src="assets/painel-clientes.js"></script>
   <script src="assets/painel.js"></script>
 </body>
 </html>

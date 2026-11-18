@@ -7,6 +7,7 @@ const CONFIG = {
   nome: 'Helena Moraes',
   whatsapp: '5500000000000',          // DDI + DDD + número, só dígitos
   horasCancelamentoSemCusto: 24,
+  senhaPadrao: 'Senha@123',            // senha inicial sugerida quando a psicóloga cadastra o cliente
 };
 
 const DIAS_SEMANA = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
@@ -110,23 +111,39 @@ function iniciarMenuMobile() {
 
 /* ===== Diálogo de cancelamento =====
    Retorna Promise<{ ok: boolean, motivo: string }> */
-function dialogoCancelar({ titulo, texto, pedirMotivo = false, aviso = '' }) {
+function dialogoCancelar({
+  titulo, texto, pedirMotivo = false, aviso = '',
+  motivoObrigatorio = false, quemVe = 'o cliente vai ver', exemplo = 'Ex.: imprevisto de saúde, vamos remarcar',
+}) {
   return new Promise((resolve) => {
     const dlg = document.createElement('dialog');
     dlg.className = 'dialogo';
+    const rotulo = motivoObrigatorio ? `Motivo do cancelamento <small>(obrigatório — ${quemVe})</small>` : `Motivo <small>(${quemVe})</small>`;
     dlg.innerHTML = `
       <form method="dialog">
         <h3>${escapar(titulo)}</h3>
         <p>${texto}</p>
         ${aviso ? `<p class="dialogo__aviso">${escapar(aviso)}</p>` : ''}
-        ${pedirMotivo ? `<label class="dialogo__campo">Motivo <small>(o cliente vai ver)</small>
-          <textarea name="motivo" rows="3" maxlength="300" placeholder="Ex.: imprevisto de saúde, vamos remarcar"></textarea></label>` : ''}
+        ${pedirMotivo ? `<label class="dialogo__campo">${rotulo}
+          <textarea name="motivo" rows="3" maxlength="300" placeholder="${escapar(exemplo)}" ${motivoObrigatorio ? 'required' : ''}></textarea></label>
+          <p class="erro dialogo__erro" role="alert" hidden>Escreva o motivo do cancelamento.</p>` : ''}
         <div class="dialogo__acoes">
-          <button value="nao" class="btn btn--linha btn--sm">Manter consulta</button>
+          <button value="nao" class="btn btn--linha btn--sm" formnovalidate>Manter consulta</button>
           <button value="sim" class="btn btn--perigo btn--sm">Cancelar consulta</button>
         </div>
       </form>`;
     document.body.appendChild(dlg);
+    if (motivoObrigatorio) {
+      const campo = dlg.querySelector('textarea');
+      const erro = dlg.querySelector('.dialogo__erro');
+      dlg.querySelector('button[value="sim"]').addEventListener('click', (e) => {
+        if (campo.value.trim()) return;
+        e.preventDefault();
+        erro.hidden = false;
+        campo.focus();
+      });
+      campo.addEventListener('input', () => { erro.hidden = true; });
+    }
     dlg.addEventListener('close', () => {
       const motivo = dlg.querySelector('textarea')?.value || '';
       resolve({ ok: dlg.returnValue === 'sim', motivo });

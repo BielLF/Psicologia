@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Helena Moraes · Psicóloga</title>
-  <meta name="description" content="Psicoterapia para adultos, presencial e online. Agende sua consulta direto pelo site.">
+  <meta name="description" content="Psicoterapia online para adultos. Agende sua consulta direto pelo site.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Gloock&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -38,7 +38,7 @@
     <section class="hero">
       <div class="wrap hero__grid">
         <div class="hero__texto">
-          <p class="sobretitulo">Psicoterapia para adultos · presencial e online</p>
+          <p class="sobretitulo">Psicoterapia online para adultos</p>
           <h1>Um horário <em>só seu</em>, toda semana.</h1>
           <p class="hero__lead">
             Um espaço de escuta sem pressa para falar de ansiedade, luto, relações e
@@ -101,20 +101,15 @@
       <div class="wrap">
         <p class="sobretitulo">Atendimentos</p>
         <h2>Como posso te ajudar</h2>
-        <div class="cards">
+        <div class="cards cards--2">
           <article class="card">
-            <h3>Psicoterapia individual</h3>
-            <p>Sessões semanais de 50 minutos para adultos, no consultório.</p>
-            <p class="card__preco">R$ 200 <span>por sessão</span></p>
-          </article>
-          <article class="card">
-            <h3>Atendimento online</h3>
-            <p>A mesma escuta, por videochamada, de onde você estiver. O link chega por e-mail.</p>
+            <h3>Psicoterapia individual online</h3>
+            <p>Sessões semanais de 50 minutos para adultos, por videochamada, de onde você estiver. O link chega por e-mail.</p>
             <p class="card__preco">R$ 180 <span>por sessão</span></p>
           </article>
           <article class="card">
-            <h3>Orientação a pais</h3>
-            <p>Encontros pontuais para pensar juntos sobre os desafios da criação dos filhos.</p>
+            <h3>Orientação a pais online</h3>
+            <p>Encontros pontuais, por videochamada, para pensar juntos sobre os desafios da criação dos filhos.</p>
             <p class="card__preco">R$ 220 <span>por sessão</span></p>
           </article>
         </div>
@@ -145,13 +140,19 @@
         <h2>Agende sua consulta</h2>
 
         <div class="agenda" id="agenda">
-          <!-- Etapa 1: modalidade + data + horário -->
-          <div class="agenda__etapa" data-etapa="1">
-            <fieldset class="modalidade">
-              <legend>Modalidade</legend>
-              <label class="pilula"><input type="radio" name="modalidade" value="Presencial" checked><span>Presencial</span></label>
-              <label class="pilula"><input type="radio" name="modalidade" value="Online"><span>Online</span></label>
-            </fieldset>
+          <!-- Sem login: a grade e os horários só aparecem para quem entrou -->
+          <div class="agenda__login" id="agenda-login" hidden>
+            <h3>Entre para ver os horários</h3>
+            <p>Para ver a agenda e marcar sua consulta, entre na sua conta ou crie uma — leva menos de um minuto.</p>
+            <div class="agenda__login-acoes">
+              <a class="btn btn--ocre" href="entrar.html?volta=index.html%23agendar">Entrar</a>
+              <a class="btn btn--linha" href="entrar.html?aba=cadastro&amp;volta=index.html%23agendar">Criar conta</a>
+            </div>
+          </div>
+
+          <!-- Etapa 1: data + horário (atendimento só online) -->
+          <div class="agenda__etapa" data-etapa="1" hidden>
+            <p class="agenda__nota">Atendimento <strong>online</strong>, por videochamada. O link da sessão chega por e-mail.</p>
 
             <div class="agenda__grid">
               <div class="calendario" aria-label="Escolha uma data">
@@ -253,7 +254,7 @@
         <p>Psicóloga · CRP 00/00000</p>
       </div>
       <div>
-        <p>Rua Exemplo, 123 — sala 45<br>Centro · Sua Cidade</p>
+        <p>Atendimento 100% online<br>Para todo o Brasil</p>
       </div>
       <div>
         <p><a href="mailto:contato@exemplo.com.br">contato@exemplo.com.br</a><br>(00) 00000-0000</p>
