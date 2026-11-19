@@ -106,8 +106,8 @@ p { margin: 0 0 1em; }
 
 /* Assinatura: a foto da poltrona com o cartão de horários livres "sentado" nela */
 .proximos { position: relative; padding-bottom: 40px; }
-.proximos__foto { border-radius: 200px 200px var(--raio) var(--raio); overflow: hidden; aspect-ratio: 4 / 4.2; }
-.proximos__foto img { width: 100%; height: 100%; object-fit: cover; }
+.proximos__foto { border-radius: 0 !important; overflow: hidden; aspect-ratio: 4 / 3; }
+.proximos__foto img { width: 100%; height: 100%; object-fit: cover; object-position: 55% center; border-radius: 0 !important; }
 .proximos__cartao {
   position: absolute; left: 50%; bottom: 0; transform: translateX(-50%);
   width: min(92%, 380px);
