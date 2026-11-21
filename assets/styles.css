@@ -80,6 +80,10 @@ p { margin: 0 0 1em; }
 .marca__crp { font-size: .75rem; color: var(--cinza); }
 .nav { display: flex; align-items: center; gap: 1.6rem; }
 .nav a:not(.btn) { text-decoration: none; font-size: .95rem; }
+.nav a[href="#sobre"],
+.nav a[href="#atendimentos"],
+.nav a[href="#como-funciona"],
+.nav a[href="#duvidas"] { font-size: 1rem; font-weight: 700; }
 .nav a:not(.btn):hover { color: var(--petroleo); text-decoration: underline; text-underline-offset: 4px; }
 .menu-btn { display: none; }
 
