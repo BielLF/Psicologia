@@ -4,7 +4,7 @@
    (editáveis no painel da psicóloga).
    ============================================================ */
 const CONFIG = {
-  nome: 'Helena Moraes',
+  nome: 'Caroline Moratto',
   whatsapp: '5500000000000',          // DDI + DDD + número, só dígitos
   horasCancelamentoSemCusto: 24,
   senhaPadrao: 'Senha@123',            // senha inicial sugerida quando a psicóloga cadastra o cliente
